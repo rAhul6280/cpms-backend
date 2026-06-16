@@ -25,6 +25,27 @@ app.get('/',(req,res)=>{
     res.send("API is running !")
 })
 
+
+//routes
+
+import userRoutes from './routes/user.routes.js';
+app.use('/api/user',userRoutes);
+
+
+
+
+
+
+
+
+//error handling middleware
+app.use((err, req, res, next) => {
+  res.status(err.statusCode || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
+});
+
 export default app;
 
 

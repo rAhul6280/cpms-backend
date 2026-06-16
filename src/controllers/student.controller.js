@@ -1,5 +1,6 @@
-import { User } from "../models/users.model";
-import asyncHandler from "../utils/asyncHandler";
+import { Student } from "../models/students.model.js";
+import { User } from "../models/users.model.js";
+import asyncHandler from "../utils/asyncHandler.js";
 
 const generateNewAccessToken = (user) => {
   try {
@@ -9,6 +10,10 @@ const generateNewAccessToken = (user) => {
     throw error;
   }
 };
+const options = {
+  httpOnly: true,
+  sameSite: "strict",
+}
 
 const registerUser = asyncHandler(async (req, res) => {
   // desturctue information from given by user
@@ -32,27 +37,26 @@ const registerUser = asyncHandler(async (req, res) => {
       .json({ success: false, data: {}, message: "invalid emailId" });
   }
 
-  const existedUser = await User.findOne({ email: email });
+  const existedUser = await User.findOne({ email });
 
   if (existedUser) {
     return res
       .status(400)
       .json({ success: false, data: {}, message: "email already exists" });
   }
-  const newUser = await User.create({ email, role, password }).select(
-    "-password",
-  );
+  const newUser = await User.create({ email, role, password })
   if (!newUser) {
     return res
       .status(500)
       .json({ success: false, data: {}, message: "user registration failed!" });
   }
-  const newStudent = await User.create({
+  //Doubt what happen if user is created but student creation fails, then we have to delete the user from user collection, so that we can maintain the integrity of data
+  const newStudent = await Student.create({
     studentId: newUser._id,
     fullName,
     age,
     address,
-  }).select("fullName age address avatar");
+  })
   if (!newStudent) {
     return res
       .status(500)
@@ -62,6 +66,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
+    .cookie("accesstoken", accesstoken, options)
     .json({
       success: true,
       data: {

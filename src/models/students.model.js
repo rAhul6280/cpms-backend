@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 
 const studentSchema=new mongoose.Schema({
-    studentId={
+    studentId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
         required:true
     },
-    fullName={
+    fullName:{
         type:String,
         required:true
     },
