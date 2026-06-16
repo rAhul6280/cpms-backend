@@ -16,16 +16,18 @@ const studentSchema=new mongoose.Schema({
         min:0
     },
     avatar:{
-        type:String //cloudinary url
+        type:String, //cloudinary url
+        default:'cpms-backend\public\avatar.png'
     },
     degree:{
         type:String,
-        required:true
+        default:''
     },
-    skills:[{type:String,required:true}],
+    skills:[{type:String}],
     cgpa:{
         type:String,
-        required:true
+        default:0
+        
     },
     projectDetails:[
         {
@@ -39,10 +41,7 @@ const studentSchema=new mongoose.Schema({
         type:String //cloudinary url
     },
     address:{
-        city:String,
-        state:String,
-        pinCode:Number
-        
+        type:String
     }
 },{timestamps:true})
 
