@@ -17,7 +17,7 @@ const studentSchema=new mongoose.Schema({
     },
     avatar:{
         type:String, //cloudinary url
-        default:'cpms-backend\public\avatar.png'
+        default:"https://cdn-icons-png.flaticon.com/512/149/149071.png"
     },
     degree:{
         type:String,
@@ -42,7 +42,14 @@ const studentSchema=new mongoose.Schema({
     },
     address:{
         type:String
-    }
+    },
+    rollNumber:{
+        type:String,
+        unique:true
+    },
+    branch:{
+        type:String,
+    },
 },{timestamps:true})
 
 export const Student=mongoose.model('Student',studentSchema)
