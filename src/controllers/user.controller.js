@@ -27,7 +27,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const { email, role, password, fullName} = req.body;
 
-  if (!email.trim() || !password.trim() || !role.trim() || !fullName.trim()) {
+  if (!email?.trim() || !password?.trim() || !role?.trim() || !fullName?.trim()) {
     return res
       .status(400)
       .json({ success: false, data: {}, message: "all fields are required" });
@@ -38,6 +38,15 @@ const registerUser = asyncHandler(async (req, res) => {
       .status(400)
       .json({ success: false, data: {}, message: "invalid emailId" });
   }
+  const allowedRoles = ["student", "recruiter", "admin"];
+
+if (!allowedRoles.includes(role)) {
+  return res.status(400).json({
+    success: false,
+    data: {},
+    message: "invalid role"
+  });
+}
 
   const existedUser = await User.findOne({ email });
 
@@ -54,26 +63,33 @@ const registerUser = asyncHandler(async (req, res) => {
   }
   //Doubt what happen if user is created but student creation fails, then we have to delete the user from user collection, so that we can maintain the integrity of data
   let newProfile;
-  if (role === "student") {
-    newProfile = await Student.create({
-      studentId: newUser._id,
-      fullName
-    })
-  } else if (role === "recruiter") {
-    newProfile = await Recruiter.create({
-      recruiterId: newUser._id,
-      fullName
-    })
-  }
-    else if (role === "admin") {
-      newProfile = await Admin.create({
-        adminId: newUser._id,
+  try {
+    
+    if (role === "student") {
+      newProfile = await Student.create({
+        studentId: newUser._id,
         fullName
       })
-  } else {
-    return res
-      .status(400)
-      .json({ success: false, data: {}, message: "invalid role" });
+    } else if (role === "recruiter") {
+      newProfile = await Recruiter.create({
+        recruiterId: newUser._id,
+        fullName,
+        companyName:req?.body?.companyName
+      })
+    }
+      else if (role === "admin") {
+        newProfile = await Admin.create({
+          adminId: newUser._id,
+          fullName
+        })
+    } else {
+      return res
+        .status(400)
+        .json({ success: false, data: {}, message: "invalid role" });
+    }
+  } catch (error) {
+    await User.findByIdAndDelete(newUser._id)
+    throw error
   }
 
   const accesstoken=generateNewAccessToken(newUser);
@@ -85,7 +101,8 @@ const registerUser = asyncHandler(async (req, res) => {
       data: {
         email: newUser.email,
         role: newUser.role,
-        fullName: newProfile.fullName
+        fullName: newProfile.fullNamef,
+        companyName:newProfile?.companyName
       },
       message: "user registered successfully!",
     });
@@ -138,6 +155,8 @@ const loginUser = asyncHandler(async (req, res) => {
       },
     });
 });
+
+
 
 
 export { registerUser, loginUser };
