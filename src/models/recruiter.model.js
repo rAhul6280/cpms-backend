@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const recruiterSchema=new mongoose.Schema({
-    recruiterId:{
+    user:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'
     },

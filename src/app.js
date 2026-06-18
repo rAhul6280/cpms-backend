@@ -29,7 +29,16 @@ app.get('/',(req,res)=>{
 //routes
 
 import userRoutes from './routes/user.routes.js';
+import studentRoute from './routes/student.route.js';
 app.use('/api/user',userRoutes);
+
+
+//student routes
+app.use('/api/student',studentRoute);
+
+
+//recruiter routes
+app.use('/api/recruiter')
 
 
 

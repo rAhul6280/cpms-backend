@@ -20,7 +20,9 @@ const selectionSchema=new mongoose.Schema({
     ctc:{
         type:Number
     },
-
+    slectionRole:{
+        type:String
+    }
 },{timestamps:true})
 
 export const Selection=mongoose.model('Selection',selectionSchema)

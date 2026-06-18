@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const adminSchema=new mongoose.Schema({
-    adminId:{
+    user:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
         required:true
