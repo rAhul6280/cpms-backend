@@ -5,12 +5,12 @@ import { getAllSelections, getFilteredSelection, updateSelectionStatus } from ".
 
 const router = Router()
 //get all selections
-router.route('/get-all').get(verifyJWT,getAllSelections)
+router.route('/selections').get(verifyJWT,getAllSelections)
 
 //get selections based on status
-router.route('/filtere-selections').get(verifyJWT,getFilteredSelection)
+router.route('/selections/filter').get(verifyJWT,getFilteredSelection)
 
-//approve or reject a selctions 
+//approve or reject a selction
 router.route('/update/:selectionId').patch(verifyJWT,updateSelectionStatus)
 
 export default router

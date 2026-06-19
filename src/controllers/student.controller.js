@@ -17,34 +17,28 @@ const getStudentProfile = asyncHandler(async (req, res) => {
 });
 
 // ── Update student profile
-const updateProfileInfo=asyncHandler(async(req,res)=>{
-    const {role}=req?.user;
-    if(role!=="student"){
-        return res.status(401).json({success:false,data:{},message:"Unauthorized access"});
+const updateProfileInfo = asyncHandler(async (req, res) => {
+    const { role } = req?.user;
+    if (role !== "student") {
+        return res.status(401).json({ success: false, data: {}, message: "Unauthorized access" });
     }
-    const{fullName,age,degree,skills,cgpa,projectDetails,address,branch,rollNumber}=req?.body
+    const { fullName, age, degree, skills, cgpa, projectDetails, address, branch, rollNumber } = req?.body
 
-    if(!fullName || !rollNumber || !cgpa || !degree || !branch ){
-        return res.status(400).json({success:false,data:{},message:"All fields are required"});
-    }
-
-    if(!Array.isArray(skills)|| skills.length===0){
-        return res.status(400).json({success:false,data:{},message:"one skill is required"});
+    if (!fullName || !rollNumber || !cgpa || !degree || !branch) {
+        return res.status(400).json({ success: false, data: {}, message: "All fields are required" });
     }
 
-    const resumePath=req?.file?.path
-    if(!resumePath){
-        return res.status(400).json({success:false,data:{},message:"resume is required"})
+    if (!Array.isArray(skills) || skills.length === 0) {
+        return res.status(400).json({ success: false, data: {}, message: "one skill is required" });
     }
 
-    const resp=await uploadOnCLoudinary(resumePath)
-    if(!resp?.secure_url){
-        return res.status(500).json({success:false,data:{},message:"image upload failed"})
-    }
+    
 
-    const newProfile=await Student.findOneAndUpdate({user:req?.user?._id},
+    
+
+    const newProfile = await Student.findOneAndUpdate({ user: req?.user?._id },
         {
-            $set:{
+            $set: {
                 fullName,
                 age,
                 degree,
@@ -53,19 +47,44 @@ const updateProfileInfo=asyncHandler(async(req,res)=>{
                 projectDetails,
                 address,
                 branch,
-                resume:resp.secure_url
             }
         },
         {
-          new: true
+            returnDocument:'after',
+            runValidators:true
         }
     )
-    if(!newProfile){
-        return res.status(400).json({success:false,data:{},message:"profile updata failed!"});
+    if (!newProfile) {
+        return res.status(400).json({ success: false, data: {}, message: "profile updata failed!" });
     }
 
-    res.status(200).json({success:true,data:{},message:"profile updated successfully!"})
+    res.status(200).json({ success: true, data: {}, message: "profile updated successfully!" })
 
 })
 
-export {getStudentProfile, updateProfileInfo};
+
+const updateResume = asyncHandler(async (req, res) => {
+  try {
+    const resumeLocalPath = req.file?.path;
+    if (!resumeLocalPath) {
+      return res.status(400).json({ success: false, message: "Resume file is missing" });
+    }
+
+    const resume = await uploadOnCloudinary(resumeLocalPath);
+    if (!resume?.url) {
+      return res.status(500).json({ success: false, message: "Resume upload failed" });
+    }
+
+    const student = await Student.findOneAndUpdate(
+      { user: req.user._id },
+      { $set: { resume: resume.url } },
+      { returnDocument: 'after', upsert: true }
+    );
+
+    return res.status(200).json({ success: true, student });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+export { getStudentProfile, updateProfileInfo,updateResume };

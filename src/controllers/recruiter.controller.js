@@ -138,7 +138,11 @@ const getMySelections = asyncHandler(async (req, res) => {
         return res.status(401).json({ success: false, data: {}, message: "Unauthorized access!" });
     }
 
-    const selections = await Selection.find({ recruiter: req.user._id })
+    const recruiter= await Recruiter.findOne({user:req?.user._id})
+    // console.log(recruiter._id);
+    
+
+    const selections = await Selection.find({ recruiter:recruiter?._id})
         .populate({
             path: 'student',
             populate: { path: 'user', select: 'email role' }
@@ -159,7 +163,9 @@ const getFilteredSelections = asyncHandler(async (req, res) => {
         return res.status(400).json({ success: false, data: {}, message: "Invalid status query. Use pending, approved, or rejected" });
     }
 
-    const selections = await Selection.find({ recruiter: req.user._id, status })
+    const recruiter=await Recruiter.findOne({user:req?.user._id})
+
+    const selections = await Selection.find({ recruiter:recruiter._id, status })
         .populate({
             path: 'student',
             populate: { path: 'user', select: 'email role' }

@@ -74,7 +74,6 @@ if (!allowedRoles.includes(role)) {
       newProfile = await Recruiter.create({
         user: newUser._id,
         fullName,
-        companyName:req?.body?.companyName
       })
     }
       else if (role === "admin") {
@@ -101,8 +100,7 @@ if (!allowedRoles.includes(role)) {
       data: {
         email: newUser.email,
         role: newUser.role,
-        fullName: newProfile.fullName,
-        companyName:newProfile?.companyName
+        fullName: newProfile.fullName
       },
       message: "user registered successfully!",
     });

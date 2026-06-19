@@ -36,14 +36,15 @@ const getAllSelections = asyncHandler(async (req, res) => {
                                         role: 1
                                     }
                                 },
-                                {
-                                    $unwind: {
-                                        path: "$user",
-                                        preserveNullAndEmptyArrays: true
-                                    }
-                                },
+
                             ]
 
+                        }
+                    },
+                    {
+                        $unwind: {
+                            path: "$user",
+                            preserveNullAndEmptyArrays: true
                         }
                     },
 
@@ -106,7 +107,7 @@ const getFilteredSelection = asyncHandler(async (req, res) => {
         return res.status(401).json({ success: false, data: {}, message: "Unauthorized access" })
     }
     const { status } = req.query
-    if (status !== 'pending' && status !== 'approved' && status!=='rejected') {
+    if (status !== 'pending' && status !== 'approved' && status !== 'rejected') {
         return res.status(400).json({ success: false, data: {}, message: "Invalid query" });
     }
 
@@ -207,27 +208,38 @@ const getFilteredSelection = asyncHandler(async (req, res) => {
     res.status(200).json({ success: true, data: selectionList, message: "Selections fetched successfully!" })
 })
 // update the status of a selection //approved/reject
-const updateSelectionStatus=asyncHandler(async (req,res) => {
-    if(req.user?.role!=='admin'){
-        return res.status(401).json({success:false,data:{},message:"Unauthorized access"});
+const updateSelectionStatus = asyncHandler(async (req, res) => {
+    if (req.user?.role !== 'admin') {
+        return res.status(403).json({ success: false, data: {}, message: "Unauthorized access" });
     }
-    const {selectionId}=req?.params
-    const {status}=req.body
-    if(!selectionId){
-        return res.status(400).json({success:false,data:{},message:"Invalid selection id"});
+    const { selectionId } = req?.params
+    const { status } = req.body
+    if (!selectionId) {
+        return res.status(400).json({ success: false, data: {}, message: "Invalid selection id" });
     }
-    if(!status || !['approved','rejected'].includes(status)){
-        return res.status(400).json({success:false,data:{},message:"Invalid status value"});
+    if (!status || !['approved', 'rejected'].includes(status)) {
+        return res.status(400).json({ success: false, data: {}, message: "Invalid status value" });
     }
-    const selection=await Selection.findByIdAndUpdate(selectionId,
+    const selection = await Selection.findByIdAndUpdate(selectionId,
         {
-            $set:{
+            $set: {
                 status
             }
+        },
+        {
+            returnDocument: 'after',
+            runValidators: true
         }
     );
-    return res.status(200).json({success:true,data:{},message:"status updated successfully!"})
-    
+    if (!selection) {
+        return res.status(404).json({
+            success: false,
+            data: {},
+            message: "Selection not found"
+        });
+    }
+    return res.status(200).json({ success: true, data: selection, message: "status updated successfully!" })
+
 })
 
 export { getAllSelections, getFilteredSelection, updateSelectionStatus }

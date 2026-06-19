@@ -44,8 +44,7 @@ const studentSchema=new mongoose.Schema({
         type:String
     },
     rollNumber:{
-        type:String,
-        unique:true
+        type:String
     },
     branch:{
         type:String,
