@@ -1,7 +1,28 @@
 import express from 'express'
-import verifyJWT from '../middlewares/auth.middleware';
-import { hireStudent } from '../controllers/recruiter.controller';
+import verifyJWT from '../middlewares/auth.middleware.js';
+import {
+    hireStudent,
+    getAllStudents,
+    getFilteredStudents,
+    getStudentById,
+    getMySelections,
+    getFilteredSelections,
+    getRecruiterProfile
+} from '../controllers/recruiter.controller.js';
 
-const router=express.Router();
+const router = express.Router();
 
-router.route('/select-student').post(verifyJWT,hireStudent)
+// Student browsing
+router.route('/students').get(verifyJWT, getAllStudents);
+router.route('/students/filter').get(verifyJWT, getFilteredStudents);
+router.route('/students/:studentId').get(verifyJWT, getStudentById);
+
+// Selection management
+router.route('/select-student').post(verifyJWT, hireStudent);
+router.route('/selections').get(verifyJWT, getMySelections);
+router.route('/selections/filter').get(verifyJWT, getFilteredSelections);
+
+// Profile
+router.route('/profile').get(verifyJWT, getRecruiterProfile);
+
+export default router

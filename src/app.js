@@ -30,6 +30,8 @@ app.get('/',(req,res)=>{
 
 import userRoutes from './routes/user.routes.js';
 import studentRoute from './routes/student.route.js';
+import recruiterRoute from './routes/recruiter.route.js';
+import adminRoute from './routes/admin.route.js';
 app.use('/api/user',userRoutes);
 
 
@@ -38,10 +40,11 @@ app.use('/api/student',studentRoute);
 
 
 //recruiter routes
-app.use('/api/recruiter')
+app.use('/api/recruiter', recruiterRoute)
 
 
-
+//admin routes
+app.use('/api/admin',adminRoute)
 
 
 

@@ -16,7 +16,7 @@ const options = {
   httpOnly: true,
   sameSite: "strict",
 }
-
+//register a user based on its role
 const registerUser = asyncHandler(async (req, res) => {
   // desturctue information from given by user
   // validate the given info
@@ -61,25 +61,25 @@ if (!allowedRoles.includes(role)) {
       .status(500)
       .json({ success: false, data: {}, message: "user registration failed!" });
   }
-  //Doubt what happen if user is created but student creation fails, then we have to delete the user from user collection, so that we can maintain the integrity of data
+  
   let newProfile;
   try {
     
     if (role === "student") {
       newProfile = await Student.create({
-        studentId: newUser._id,
+        user: newUser._id,
         fullName
       })
     } else if (role === "recruiter") {
       newProfile = await Recruiter.create({
-        recruiterId: newUser._id,
+        user: newUser._id,
         fullName,
         companyName:req?.body?.companyName
       })
     }
       else if (role === "admin") {
         newProfile = await Admin.create({
-          adminId: newUser._id,
+          user: newUser._id,
           fullName
         })
     } else {
@@ -101,13 +101,14 @@ if (!allowedRoles.includes(role)) {
       data: {
         email: newUser.email,
         role: newUser.role,
-        fullName: newProfile.fullNamef,
+        fullName: newProfile.fullName,
         companyName:newProfile?.companyName
       },
       message: "user registered successfully!",
     });
 });
 
+//login a user based on its role
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -129,12 +130,12 @@ const loginUser = asyncHandler(async (req, res) => {
   let profileData = null;
 
   if (user.role === "student") {
-     profileData = await Student.findOne({ studentId: user._id }).select("-__v -createdAt -updatedAt  -studentId");
+     profileData = await Student.findOne({ user: user._id }).select("-__v -createdAt -updatedAt  -user");
   } else if (user.role === "recruiter") {
-     profileData = await Recruiter.findOne({ recruiterId: user._id }).select("-__v -createdAt -updatedAt  -recruiterId");
+     profileData = await Recruiter.findOne({ user: user._id }).select("-__v -createdAt -updatedAt  -user");
 
   } else if (user.role === "admin") {
-     profileData = await Admin.findOne({ adminId: user._id }).select("-__v -createdAt -updatedAt -adminId");
+     profileData = await Admin.findOne({ user: user._id }).select("-__v -createdAt -updatedAt -user");
   }
   if(!profileData){
     return res.status(404).json({ success: false, message: "User profile not found" });

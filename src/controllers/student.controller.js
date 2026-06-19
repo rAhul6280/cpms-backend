@@ -2,9 +2,24 @@ import { Student } from "../models/students.model.js";
 import { uploadOnCLoudinary } from "../services/cloudinary.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
+// ── Get student's own profile
+const getStudentProfile = asyncHandler(async (req, res) => {
+    if (req?.user?.role !== 'student') {
+        return res.status(401).json({ success: false, data: {}, message: "Unauthorized access" });
+    }
+
+    const student = await Student.findOne({ user: req.user._id }).populate('user', 'email role');
+    if (!student) {
+        return res.status(404).json({ success: false, data: {}, message: "Student profile not found" });
+    }
+
+    return res.status(200).json({ success: true, data: student, message: "Profile fetched successfully!" });
+});
+
+// ── Update student profile
 const updateProfileInfo=asyncHandler(async(req,res)=>{
     const {role}=req?.user;
-    if(!role!=="student"){
+    if(role!=="student"){
         return res.status(401).json({success:false,data:{},message:"Unauthorized access"});
     }
     const{fullName,age,degree,skills,cgpa,projectDetails,address,branch,rollNumber}=req?.body
@@ -27,7 +42,7 @@ const updateProfileInfo=asyncHandler(async(req,res)=>{
         return res.status(500).json({success:false,data:{},message:"image upload failed"})
     }
 
-    const newProfile=await Student.findOneAndUpdate({studentId:req?.user?._id},
+    const newProfile=await Student.findOneAndUpdate({user:req?.user?._id},
         {
             $set:{
                 fullName,
@@ -53,4 +68,4 @@ const updateProfileInfo=asyncHandler(async(req,res)=>{
 
 })
 
-export {updateProfileInfo};
+export {getStudentProfile, updateProfileInfo};

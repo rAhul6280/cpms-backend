@@ -9,18 +9,15 @@ const selectionSchema=new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'Student'
     },
-    verifiedBy:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Admin'
-    },
+    
     status:{
         type:String,
-        enum:['pending','verified']
+        enum:['pending','approved','rejected']
     },
     ctc:{
         type:Number
     },
-    slectionRole:{
+    selectionRole:{
         type:String
     }
 },{timestamps:true})
