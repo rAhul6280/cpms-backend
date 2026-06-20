@@ -14,6 +14,7 @@ const generateNewAccessToken = (user) => {
 };
 const options = {
   httpOnly: true,
+  secure:true,
   sameSite: "strict",
 }
 //register a user based on its role
@@ -155,7 +156,44 @@ const loginUser = asyncHandler(async (req, res) => {
     });
 });
 
+// get user profile
 
+const getUserProfile=asyncHandler(async(req,res)=>{
+  if(!req?.user?._id){
+    return res.status(401).json({success:false,data:{},message:"Unauthorized access "});
+  }
 
+  user=req.user;
+  let profileData = null;
 
-export { registerUser, loginUser };
+  if (user.role === "student") {
+     profileData = await Student.findOne({ user: user._id }).select("-__v -createdAt -updatedAt  -user");
+  } else if (user.role === "recruiter") {
+     profileData = await Recruiter.findOne({ user: user._id }).select("-__v -createdAt -updatedAt  -user");
+
+  } else if (user.role === "admin") {
+     profileData = await Admin.findOne({ user: user._id }).select("-__v -createdAt -updatedAt -user");
+  }
+  if(!profileData){
+    return res.status(404).json({ success: false, message: "User profile not found" });
+  }
+
+  return res
+    .status(200)
+    .json({
+      success: true,
+      message: "data fetched successfully!",
+      data: {
+        email:   user.email,
+        role:    user.role,
+        profile: profileData,  
+      },
+    });
+})
+
+const logoutUser=asyncHandler(async (req,res) => {
+  res.status(200).clearCookie('accesstoken',options)
+  .json({success:true,data:{},message:"user logged out successfully!"})
+})
+
+export { registerUser, loginUser,getUserProfile,logoutUser };
