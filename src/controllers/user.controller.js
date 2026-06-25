@@ -15,7 +15,7 @@ const generateNewAccessToken = (user) => {
 const options = {
   httpOnly: true,
   secure:true,
-  sameSite: "strict",
+  // sameSite: "strict",
 }
 //register a user based on its role
 const registerUser = asyncHandler(async (req, res) => {
@@ -163,7 +163,7 @@ const getUserProfile=asyncHandler(async(req,res)=>{
     return res.status(401).json({success:false,data:{},message:"Unauthorized access "});
   }
 
-  user=req.user;
+  let user=req.user;
   let profileData = null;
 
   if (user.role === "student") {
