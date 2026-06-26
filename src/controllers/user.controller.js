@@ -101,7 +101,7 @@ if (!allowedRoles.includes(role)) {
       data: {
         email: newUser.email,
         role: newUser.role,
-        fullName: newProfile.fullName
+        profile:newProfile
       },
       message: "user registered successfully!",
     });
