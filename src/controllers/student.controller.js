@@ -1,5 +1,5 @@
 import { Student } from "../models/students.model.js";
-import { uploadOnCLoudinary } from "../services/cloudinary.js";
+import { uploadOnCLoudinary } from '../services/cloudinary.js'
 import asyncHandler from "../utils/asyncHandler.js";
 
 // ── Get student's own profile
@@ -70,7 +70,7 @@ const updateResume = asyncHandler(async (req, res) => {
       return res.status(400).json({ success: false, message: "Resume file is missing" });
     }
 
-    const resume = await uploadOnCloudinary(resumeLocalPath);
+    const resume = await uploadOnCLoudinary(resumeLocalPath);
     if (!resume?.url) {
       return res.status(500).json({ success: false, message: "Resume upload failed" });
     }

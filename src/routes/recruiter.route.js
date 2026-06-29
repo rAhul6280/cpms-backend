@@ -12,13 +12,13 @@ import {
 
 const router = express.Router();
 
-// Student browsing
+// Studnet browsing
 router.route('/students').get(verifyJWT, getAllStudents);
 router.route('/students/filter').get(verifyJWT, getFilteredStudents);
 router.route('/students/:studentId').get(verifyJWT, getStudentById);
 
 // Selection management
-router.route('/select-student').post(verifyJWT, hireStudent);
+router.route('/hire').post(verifyJWT, hireStudent);
 router.route('/selections').get(verifyJWT, getMySelections);
 router.route('/selections/filter').get(verifyJWT, getFilteredSelections);
 
