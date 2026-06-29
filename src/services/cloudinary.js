@@ -10,12 +10,15 @@ cloudinary.config({
 async function uploadOnCLoudinary(localPath){
     if(!localPath||!localPath.trim())return null;
     try {
-        const response=await cloudinary.uploader.upload(localPath,{resource_type:'raw'})
+        
+        const response=await cloudinary.uploader.upload(localPath,{resource_type:'auto'})
         // console.log(response);
         console.log('File uploaded successfully on cloudinary');
         return response;
     } catch (error) {
-        console.log("file upload failed",error.message)
+        console.log(error);
+        
+        console.log("file upload failed",error?.message)
         return null;
     }finally{
      if(fs.existsSync(localPath)){

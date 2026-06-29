@@ -47,6 +47,7 @@ const updateProfileInfo = asyncHandler(async (req, res) => {
                 projectDetails,
                 address,
                 branch,
+                rollNumber
             }
         },
         {
