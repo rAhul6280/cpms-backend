@@ -1,7 +1,9 @@
 import { Selection } from "../models/selection.model.js";
 import { Student } from "../models/students.model.js";
 import { Recruiter } from "../models/recruiter.model.js";
+import { User } from "../models/users.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import { sendStudentSelectedEmail } from "../services/email.service.js";
 
 //Hire a student
 const hireStudent = asyncHandler(async (req, res) => {
@@ -9,7 +11,7 @@ const hireStudent = asyncHandler(async (req, res) => {
         return res.status(401).json({ success: false, data: {}, message: "Unauthorized access!" });
     }
     const { ctc, studentId, selectionRole } = req.body;
-    const student = await Student.findById(studentId);
+    const student = await Student.findById(studentId).populate('user', 'email');
     if (!student) {
         return res.status(400).json({ success: false, data: {}, message: "Invalid student id" });
     }
@@ -29,6 +31,16 @@ const hireStudent = asyncHandler(async (req, res) => {
     if (!selection) {
         return res.status(400).json({ success: false, data: {}, message: "something went wrong" });
     }
+
+    // Send email notification to the selected student (fire-and-forget)
+    sendStudentSelectedEmail({
+        studentEmail: student.user.email,
+        studentName: student.fullName,
+        recruiterName: recruiter.fullName,
+        selectionRole,
+        ctc,
+    });
+
     return res.status(200).json({ success: true, data: selection, message: "student selected successfully!" });
 });
 
