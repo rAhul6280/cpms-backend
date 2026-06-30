@@ -1,4 +1,5 @@
 import { Student } from "../models/students.model.js";
+import { Selection } from "../models/selection.model.js";
 import { uploadOnCLoudinary } from '../services/cloudinary.js'
 import asyncHandler from "../utils/asyncHandler.js";
 
@@ -88,4 +89,21 @@ const updateResume = asyncHandler(async (req, res) => {
   }
 });
 
-export { getStudentProfile, updateProfileInfo,updateResume };
+const getStudentSelections = asyncHandler(async (req, res) => {
+    if (req?.user?.role !== 'student') {
+        return res.status(401).json({ success: false, data: {}, message: "Unauthorized access" });
+    }
+
+    const student = await Student.findOne({ user: req.user._id });
+    if (!student) {
+        return res.status(404).json({ success: false, data: {}, message: "Student profile not found" });
+    }
+
+    const selections = await Selection.find({ student: student._id })
+        .populate('recruiter', 'fullName avatar')
+        .sort({ createdAt: -1 });
+
+    return res.status(200).json({ success: true, data: selections, message: "Selections fetched successfully!" });
+});
+
+export { getStudentProfile, updateProfileInfo, updateResume, getStudentSelections };
